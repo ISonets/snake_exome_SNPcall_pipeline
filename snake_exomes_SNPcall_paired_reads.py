@@ -177,7 +177,7 @@ rule snp_annotate_unmatched:  # same tactics, but for all SNP from snp list to g
             final_snps_unmatched_anno = "res_snake/vcf/{sample}_unmatched_res.txt"
     params: snps_list = "/mnt/disk1/PROJECTS/EXOMS/RESULTS/panels/rs_txt_lists/crohn_all_nodup.txt",
             genomes1k = "/mnt/disk1/DATABASES/1k_genomes_test/1000GENOMES-phase_3_mod.vcf",
-            snps_coords="/mnt/disk1/PROJECTS/EXOMS/RESULTS/panels/beds/snp_loc_final.bed"
+            snps_coords="/mnt/disk1/PROJECTS/EXOMS/RESULTS/panels/beds/snp_loc_final_0based.bed"
     shell: """
            grep -oFf {params.snps_list} {input.final_snps_anno} |grep -vFf - {params.snps_list} | grep -wf - {params.snps_coords} | cut -f1,2 | grep -wf - {input.dedup_reads_depth} > {output.final_snps_unmatched_depth}
            awk 'NR==FNR{{a[$1,$2]=$3;next}} (($1,$2) in a) {{$6="0/0"; $7=a[$1,$2]; print }}' {output.final_snps_unmatched_depth} {params.genomes1k} | awk '{{print $1,$2,$3,$4,$5,$6,$7,$7,$8}}' | awk '{{$7=$7"/0"; print}}' | sed 's/ /\\t/g' >  {output.final_snps_unmatched_anno}
